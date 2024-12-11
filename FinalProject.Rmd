@@ -192,7 +192,7 @@ ggplot(results, aes(x = Actual, y = Predicted)) +
   )
 ```
 
-Explain:
+Explain: The scatter plot illustrates the relationship between the actual and predicted prices of used cars based on the regression model. The blue points represent individual observations, while the red dashed line indicates the ideal case where predicted prices perfectly match actual prices (a 45-degree line). The clustering of points along the red line demonstrates that the model generally performs well, with many predictions close to their corresponding actual values. However, deviations from the line, particularly at higher price ranges, indicate areas where the model's predictions deviate from reality. For instance, some points above or below the line reflect overestimation or underestimation of car prices by the model. Overall, the model captures the general trend in pricing but shows increasing variance at higher price points, suggesting that additional factors or non-linear relationships might need to be considered to improve the accuracy of the predictions in these ranges.
 
 
 
@@ -203,7 +203,7 @@ Explain:
 summary(model$finalModel)
 
 ```
-Explain :
+Explain : The regression model predicts the dependent variable using six predictors: Year, Kilometers_Driven, Mileage, Engine, Power, and Seats. The residuals indicate a good fit, with the median close to zero (-0.492) and most residuals falling within a reasonable range (-2.520 to 1.789 for the interquartile range). Among the predictors, Year (β = 0.923, p < 2e-16), Kilometers_Driven (β = -1.102e-05, p = 0.000124), and Power (β = 0.164, p < 2e-16) have significant effects on the outcome variable, suggesting that newer models, lower mileage, and higher power are strongly associated with higher values of the outcome. However, Mileage, Engine, and Seats are not statistically significant (p > 0.05) and do not meaningfully contribute to the model. The model explains 69.4% of the variance in the dependent variable (R² = 0.6943), and the overall model is highly significant (F = 1395, p < 2.2e-16). This suggests that the model fits the data well, with Year, Power, and Kilometers_Driven being key predictors, but it may benefit from refinement by removing insignificant variables or exploring additional features.
 
 
 # Model Performance
