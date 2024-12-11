@@ -238,7 +238,32 @@ numerical_data %>%
   labs(title = "Average Price by Number of Seats", x = "Seats", y = "Average Price ") +
   theme_minimal()
 ```
+```{r}
+# Clean the 'Engine' column to remove 'CC' and convert it to numeric
+joined_data$Engine <- as.numeric(gsub(" CC", "", joined_data$Engine))
 
+# Pivot to calculate average engine size by Fuel Type
+fuel_type_avg_engine <- joined_data %>%
+  group_by(Fuel_Type) %>%
+  summarise(Average_Engine_Size = mean(Engine, na.rm = TRUE)) %>%
+  arrange(desc(Average_Engine_Size))
+
+# View the result
+print(fuel_type_avg_engine)
+```
+
+```{r}
+ggplot(fuel_type_avg_engine, aes(x = reorder(Fuel_Type, -Average_Engine_Size), y = Average_Engine_Size)) +
+  geom_bar(stat = "identity", fill = "coral") +
+  geom_text(aes(label = round(Average_Engine_Size, 1)), 
+            vjust = -0.5, # Adjust vertical position of the labels
+            color = "black", 
+            size = 4) + # Adjust text size
+  labs(title = "Average Engine Size by Fuel Type",
+       x = "Fuel Type",
+       y = "Average Engine Size (CC)") +
+  theme_minimal()
+```
 
 ```{r}
 # Load necessary libraries
