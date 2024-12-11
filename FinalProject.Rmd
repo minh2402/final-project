@@ -25,7 +25,7 @@ library(tidyverse)
 library(corrplot)
 library(caret)
 
-data <- read.csv("used_cars_data.csv", stringsAsFactors = FALSE)
+#data <- read.csv("used_cars_data.csv", stringsAsFactors = FALSE)
 
 ```
 
@@ -105,7 +105,7 @@ ggplot(used_cars_time) +
  transition_reveal(Year)
 ```
 
-Explain:
+Explain with citation:
 
 
 
@@ -116,7 +116,7 @@ ggplot(numerical_data, aes(x = Mileage)) +
   labs(title = "Mileage Distribution", x = "Mileage (km/l)", y = "Count") +
   theme_minimal()
 ```
-Explain:
+Explain with citation:
 
 ```{r}
 # Bar Plot: Average Price by Seats
@@ -128,7 +128,9 @@ numerical_data %>%
   labs(title = "Average Price by Number of Seats", x = "Seats", y = "Average Price (Lakhs)") +
   theme_minimal()
 ```
-Explain:
+Explain with citation:
+
+
 ## Model and Results
 
 # Model
@@ -190,7 +192,7 @@ ggplot(results, aes(x = Actual, y = Predicted)) +
   )
 ```
 
-
+Explain:
 
 
 
@@ -201,7 +203,7 @@ ggplot(results, aes(x = Actual, y = Predicted)) +
 summary(model$finalModel)
 
 ```
-Explain:
+Explain :
 
 
 # Model Performance
@@ -281,6 +283,8 @@ print(summary_by_seats)
 #write.csv(summary_by_seats, "summary_by_seats.csv", row.names = FALSE)
 
 ```
+Explain with citations:
+
 
 ```{r}
 library(dplyr)
@@ -371,6 +375,8 @@ plot(test_data$Price, predictions,
      main = "Actual vs Predicted Prices")
 abline(0, 1, col = "red")  # Add a 45-degree line for reference
 ```
+Explain with citation:
+
 
 ```{r}
 # Load necessary libraries
@@ -445,7 +451,7 @@ plot(test_data$Price, predictions,
 abline(0, 1, col = "red")  # Add a 45-degree line for reference
 
 ```
-
+Explain with citations:
 
 ## Ethical Considerations
 
