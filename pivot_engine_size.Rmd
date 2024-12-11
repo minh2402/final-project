@@ -1,0 +1,384 @@
+---
+title: "Untitled"
+author: "Minh"
+date: "2024-12-09"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Load the datasets
+used_cars_data <- read.csv("used_cars_data.csv")
+used_car_sales <- read.csv("used_car_sales.csv")
+
+# Inspect the datasets
+head(used_cars_data)
+head(used_car_sales)
+
+used_car_sales$'Kilometer_Driven' = used_car_sales$Mileage
+used_car_sales$Mileage = NULL
+
+# Pivot the datasets if necessary
+# Example: Pivoting 'used_cars_data' longer
+used_cars_data_long <- used_cars_data %>%
+  pivot_longer(cols = -common_column, # Replace with columns to keep
+               names_to = "variable",
+               values_to = "value")
+
+# Join the datasets
+combined_data <- used_cars_data_long %>%
+  left_join(used_car_sales, by = "common_column") # Replace 'common_column' with your joining key
+
+# View the combined dataset
+head(combined_data)
+
+```
+
+
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Load the datasets
+used_cars_data <- read.csv("used_cars_data.csv")
+used_car_sales <- read.csv("used_car_sales.csv")
+
+# Convert all columns to the same type (e.g., character) before pivoting
+used_cars_data <- used_cars_data %>%
+  mutate(across(c(Kilometers_Driven, Fuel_Type, Owner_Type), as.character))
+
+
+# Pivot 'used_cars_data' to long format
+used_cars_data_long <- used_cars_data %>%
+  pivot_longer(
+    cols = c(Kilometers_Driven, Fuel_Type, Owner_Type), # Columns to pivot
+    names_to = "Attribute",                            # New column for attribute names
+    values_to = "Value"                                # New column for values
+  )
+
+# Inspect the pivoted data
+head(used_cars_data_long)
+
+# Optionally join with 'used_car_sales'
+combined_data <- used_cars_data_long %>%
+  left_join(used_car_sales, by = "Year") # Replace 'Year' with a common column
+
+# View the combined dataset
+head(combined_data)
+
+```
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Load the datasets
+used_cars_data <- read.csv("used_cars_data.csv")
+cars93_data <- read.csv("Cars93.csv")
+
+# Inspect the datasets
+str(used_cars_data)
+str(cars93_data)
+
+used_cars_data <- used_cars_data %>%
+  mutate(across(c(Year, Price), as.character))
+
+
+# Pivot used_cars_data into a longer format
+used_cars_long <- used_cars_data %>%
+  pivot_longer(
+    cols = c(RPM),  # Adjust to actual numeric column names
+    names_to = "",
+    values_to = ""
+  )
+
+# Inspect the pivoted data
+head(used_cars_long)
+
+# Join datasets on a common column (adjust "Year" as appropriate)
+combined_data <- used_cars_long %>%
+  left_join(cars93_data, by = "RPM")  # Replace "Year" with a valid key
+
+# Inspect the combined dataset
+head(combined_data)
+
+
+```
+
+```{r}
+# Pivot back to a wider format
+combined_data_wide <- combined_data %>%
+  pivot_wider(
+    names_from = Attribute,
+    values_from = Value
+  )
+
+# Inspect the wide-format data
+head(combined_data_wide)
+
+```
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Load the datasets
+used_cars_data <- read.csv("used_cars_data.csv")
+cars93_data <- read.csv("Cars93.csv")
+
+# Convert all columns to the same type before pivoting
+used_cars_data <- used_cars_data %>%
+  mutate(across(c(Year, Kilometers_Driven, Mileage, Engine, Power, Seats), as.character))
+
+# Pivot the relevant columns from used_cars_data
+used_cars_long <- used_cars_data %>%
+  pivot_longer(
+    cols = c(Year, Kilometers_Driven, Mileage, Engine, Power, Seats),
+    names_to = "AirBags",
+    values_to = "Value"
+  )
+
+# Inspect the pivoted data
+head(used_cars_long)
+
+# Add relevant variables (e.g., RPM) from Cars93.csv
+# Assuming `Name` corresponds to `Model` in Cars93.csv
+cars93_relevant <- cars93_data %>%
+  select(Model, RPM, Horsepower, Length, Width)  # Adjust column selection as needed
+
+# Join datasets on a common key
+combined_data <- used_cars_long %>%
+  left_join(cars93_relevant, by = c("Name" = "Model"))  # Adjust keys as necessary
+
+# Inspect the combined dataset
+head(combined_data)
+
+# Optional: Save the combined dataset to a CSV
+write.csv(combined_data, "combined_data.csv", row.names = FALSE)
+```
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Load the datasets
+used_cars_data <- read.csv("used_cars_data.csv")
+cars93_data <- read.csv("Cars93.csv")
+
+# Inspect the datasets
+colnames(used_cars_data)
+colnames(cars93_data)
+
+# Select and rename relevant columns for clarity
+# Assuming 'Seats' exists in `used_cars_data` and 'Passengers' exists in `Cars93`
+used_cars_selected <- used_cars_data %>%
+  select(Name, Seats) %>%
+  mutate(Data_Source = "Used_Cars")  # Add source identifier
+
+cars93_selected <- cars93_data %>%
+  select(Model, Passengers) %>%
+  rename(Name = Model, Seats = Passengers) %>%  # Align column names
+  mutate(Data_Source = "Cars93")  # Add source identifier
+
+# Combine the datasets
+combined_data <- bind_rows(used_cars_selected, cars93_selected)
+
+# Pivot the combined data into long format
+combined_data_long <- combined_data %>%
+  pivot_longer(
+    cols = Seats,             # Columns to pivot
+    names_to = "Attribute",   # Name of the new column for attribute names
+    values_to = "Value"       # Name of the new column for values
+  )
+
+# Inspect the pivoted data
+head(combined_data_long)
+
+# Save the pivoted data to a CSV
+write.csv(combined_data_long, "combined_data_long.csv", row.names = FALSE)
+
+```
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Load the datasets
+combined_data <- read.csv("combined_data.csv")
+combined_data_long <- read.csv("combined_data_long.csv")
+
+# Combine the data
+# Assuming both datasets have similar structures or keys
+full_combined_data <- combined_data %>%
+  left_join(combined_data_long, by = "Name")  # Adjust the key as necessary
+
+# Remove columns with only NA values
+cleaned_combined_data <- full_combined_data %>%
+  select(where(~ !all(is.na(.))))
+
+# Inspect the cleaned data
+head(cleaned_combined_data)
+
+# Save the cleaned data to a new CSV
+write.csv(cleaned_combined_data, "cleaned_combined_data.csv", row.names = FALSE)
+
+```
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Load the cleaned data
+cleaned_combined_data <- read.csv("cleaned_combined_data.csv")
+
+# Inspect the structure of the dataset
+str(cleaned_combined_data)
+
+# Separate the 'airbags' column into distinct columns
+# Assuming the 'airbags' column contains information like "Power: X, Seats: Y, Other: Z"
+cleaned_combined_data <- cleaned_combined_data %>%
+  separate(
+    AirBags, 
+    into = c("Airbag_Power", "Airbag_Seats", "Airbag_Other"),  # Adjust based on the content
+    sep = ", ",  # Separator for splitting (adjust if needed)
+    fill = "right"  # Fill missing values with NA
+  )
+
+# Further split individual variables (e.g., "Power: X") into key-value pairs if necessary
+# Example: Separate 'Airbag_Power' into key and value
+cleaned_combined_data <- cleaned_combined_data %>%
+  mutate(
+    Airbag_Power = str_replace(Airbag_Power, "Power: ", ""),  # Remove the prefix "Power: "
+    Airbag_Seats = str_replace(Airbag_Seats, "Seats: ", ""),  # Remove the prefix "Seats: "
+    Airbag_Other = str_replace(Airbag_Other, "Other: ", "")   # Remove the prefix "Other: "
+  )
+
+# Inspect the modified data
+head(cleaned_combined_data)
+
+# Save the modified dataset to a new CSV
+write.csv(cleaned_combined_data, "cleaned_combined_data_modified.csv", row.names = FALSE)
+
+
+```
+```{r}
+# Load required libraries
+library(dplyr)
+
+# Read the data
+used_cars_data <- read.csv("used_cars_data.csv")
+cars93_data <- read.csv("Cars93.csv")
+
+# Merge datasets using a common key (assuming 'Name' in used_cars_data matches 'Model' in Cars93)
+updated_data <- used_cars_data %>%
+  left_join(cars93_data %>% select(Model, Passengers), by = c("Name" = "Model"))
+
+# Save the updated dataset
+write.csv(updated_data, "updated_used_cars_data.csv", row.names = FALSE)
+
+```
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(tidyr)
+
+# Load the dataset
+used_cars_data <- read.csv("used_cars_data.csv")
+
+# Clean the 'Engine' column to remove 'CC' and convert it to numeric
+used_cars_data$Engine <- as.numeric(gsub(" CC", "", used_cars_data$Engine))
+
+# Pivot the data: Calculate average engine size for each year
+pivot_table <- used_cars_data %>%
+  group_by(Year) %>%
+  summarise(Average_Engine_Size = mean(Engine, na.rm = TRUE)) %>%
+  arrange(Year)
+
+# View the result
+print(pivot_table)
+
+```
+```{r}
+library(ggplot2)
+
+# Line chart for average engine size over the years
+ggplot(pivot_table, aes(x = Year, y = Average_Engine_Size)) +
+  geom_line(color = "blue", size = 1.2) +
+  geom_point(color = "red", size = 2) +
+  labs(title = "Trend of Average Engine Sizes Over Years",
+       x = "Year",
+       y = "Average Engine Size (CC)") +
+  theme_minimal()
+
+```
+
+```{r}
+# Bar chart for average engine size over the years
+ggplot(pivot_table, aes(x = factor(Year), y = Average_Engine_Size)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(title = "Average Engine Sizes by Year",
+       x = "Year",
+       y = "Average Engine Size (CC)") +
+  theme_minimal()
+
+```
+```{r}
+library(tidyr)
+
+# Pivot table to count cars by fuel type
+fuel_type_pivot <- used_cars_data %>%
+  count(Fuel_Type) %>%
+  pivot_wider(names_from = Fuel_Type, values_from = n, values_fill = 0)
+
+# View the result
+print(fuel_type_pivot)
+
+
+```
+
+```{r}
+# Clean the 'Engine' column to remove 'CC' and convert it to numeric
+used_cars_data$Engine <- as.numeric(gsub(" CC", "", used_cars_data$Engine))
+
+# Pivot to calculate average engine size by Fuel Type
+fuel_type_avg_engine <- used_cars_data %>%
+  group_by(Fuel_Type) %>%
+  summarise(Average_Engine_Size = mean(Engine, na.rm = TRUE)) %>%
+  arrange(desc(Average_Engine_Size))
+
+# View the result
+print(fuel_type_avg_engine)
+
+
+
+```
+
+```{r}
+ggplot(fuel_type_count, aes(x = reorder(Fuel_Type, -Count), y = Count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(title = "Count of Cars by Fuel Type",
+       x = "Fuel Type",
+       y = "Number of Cars") +
+  theme_minimal()
+
+```
+
+```{r}
+ggplot(fuel_type_avg_engine, aes(x = reorder(Fuel_Type, -Average_Engine_Size), y = Average_Engine_Size)) +
+  geom_bar(stat = "identity", fill = "coral") +
+  geom_text(aes(label = round(Average_Engine_Size, 1)), 
+            vjust = -0.5, # Adjust vertical position of the labels
+            color = "black", 
+            size = 4) + # Adjust text size
+  labs(title = "Average Engine Size by Fuel Type",
+       x = "Fuel Type",
+       y = "Average Engine Size (CC)") +
+  theme_minimal()
+
+```
+
+
