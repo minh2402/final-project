@@ -1,0 +1,290 @@
+---
+title: 'MAT374: Chapter 2 homework'
+author: PUT YOUR NAME HERE
+date: \today
+output: pdf_document
+geometry: margin=0.85in
+fontsize: 12pt
+header-includes:
+- \usepackage{setspace}\onehalfspacing
+---
+
+\tableofcontents
+\listoffigures
+\listoftables 
+
+\newpage
+
+```{r, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(fig.width = 10, fig.height = 5, echo = TRUE, eval = TRUE)
+library(knitr)
+library(tidyverse)
+
+
+#library(tidyverse)
+library(corrplot)
+library(caret)
+
+data <- read.csv("used_cars_data.csv", stringsAsFactors = FALSE)
+
+```
+
+
+## Introduction
+
+This project focuses on exploring the dynamics of the used car market by analyzing key factors that influence vehicle pricing. With the growing popularity of used vehicles, understanding how attributes such as brand, model, year, engine specifications, mileage, and kilometers driven affect the price is essential for both consumers and dealers. The dataset, `used_cars_data.csv`, sourced from Kaggle, provides comprehensive information on these characteristics, offering valuable insights into their contributions to car valuation. By leveraging this dataset, we aim to develop a robust predictive model that accurately estimates a used car's price based on its features. This research has practical applications, empowering buyers to make informed purchasing decisions and enabling sellers to price vehicles competitively in the marketplace.
+
+Our second approach builds upon this analysis by employing a cross-validated linear regression model to enhance the accuracy of price predictions. This model will be compared to the initial model to evaluate improvements in predictive performance. The model is based on the general equation: `$Y = B_0 + B_1 x_1 + B_2 x_2 + B_n x_n$` where `$Y$` is the response variable(pricted price) and the `$B's$` represents the coefficients and the `$x's$` are the input variables. Key predictors include numeric variables such as mileage, engine capacity, and kilometers driven. Through rigorous pre-processing, including data cleaning and normalization, the model ensures the reliability and accuracy of predictions, providing deeper insights into the factors shaping the pricing of used cars.
+
+
+# Research Question
+What are the key factors influencing the price of used cars and understanding how these factors can assist consumers in evaluating fair prices and help sellers optimize their pricing strategies
+
+
+## Data Wrangling & Data Set Description 
+
+# Data Set
+The data set('used_cars_data.csv') from kaggle contains details of used cars, including price, year, kilometers driven, mileage, engine capacity, power, etc.
+
+
+# Data wrangling
+```{r}
+# Data Cleaning
+data$Mileage <- as.numeric(str_extract(data$Mileage, "\\d+\\.\\d+"))
+data$Engine <- as.numeric(str_extract(data$Engine, "\\d+"))
+data$Power <- as.numeric(str_extract(data$Power, "\\d+\\.\\d+"))
+
+# Remove Rows with Missing Price
+data <- data %>% filter(!is.na(Price))
+
+# Select Relevant Variables
+numerical_data <- data %>%
+  select(Price, Year, Kilometers_Driven, Mileage, Engine, Power, Seats) %>%
+  na.omit()
+```
+Data wrangling is a crucial step in the analysis process to prepare raw data for modeling and insights. In this case, the used car dataset contained several columns with numeric information stored as text (e.g., Mileage, Engine, and Power). These were converted to numeric formats to ensure they could be used in mathematical operations and modeling. Additionally, rows with missing values in the Price column were removed since price is the target variable, and missing values would interfere with predictions. Finally, non-essential columns were excluded, and rows with missing values in key variables were omitted to ensure the dataset was complete and consistent for analysis.
+
+By performing these steps, we ensure that the data is clean, correctly formatted, and suitable for building reliable and interpretable predictive models. This process minimizes errors and ensures that our results are accurate and meaningful.
+
+## Exploratory Data Analysis
+Here is a visual representation of some of the variables.
+
+```{r}
+
+# Exploratory Data Analysis
+# Correlation Matrix and Heatmap
+cor_matrix <- cor(numerical_data)
+corrplot(cor_matrix, method = "circle", type = "upper",
+         tl.col = "black", tl.srt = 45,
+         title = "Correlation Matrix for Used Cars Data",
+         mar = c(0, 0, 1, 0))
+
+```
+The correlation matrix plot, visualizing the relationships between numerical variables in the used car dataset. Each variable is paired with the others, and the size and color of the circles represent the strength and direction of their correlations. Positive correlations are shown in blue, while negative correlations are in red. The darker and larger the circle, the stronger the correlation. For instance, variables like Power and Price appear to have a strong positive correlation, indicating that as engine power increases, the price of the car tends to increase. Conversely, variables like Mileage show weaker or mixed relationships with other variables. This plot helps identify which features are most strongly related to the target variable (Price) for predictive modeling.
+
+```{r}
+# Boxplot: Price by Year
+ggplot(numerical_data, aes(x = as.factor(Year), y = Price)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "Price Distribution by Year",
+       x = "Year of Manufacture", y = "Price (Lakhs)") +
+  theme_minimal()
+
+```
+
+
+```{r}
+# Histogram: Mileage Distribution
+ggplot(numerical_data, aes(x = Mileage)) +
+  geom_histogram(binwidth = 2, fill = "blue", alpha = 0.8) +
+  labs(title = "Mileage Distribution", x = "Mileage (km/l)", y = "Count") +
+  theme_minimal()
+```
+
+
+```{r}
+# Bar Plot: Average Price by Seats
+numerical_data %>%
+  group_by(Seats) %>%
+  summarise(Average_Price = mean(Price, na.rm = TRUE)) %>%
+  ggplot(aes(x = as.factor(Seats), y = Average_Price)) +
+  geom_bar(stat = "identity", fill = "blue", alpha = 0.8) +
+  labs(title = "Average Price by Number of Seats", x = "Seats", y = "Average Price (Lakhs)") +
+  theme_minimal()
+```
+
+## Model and Results
+
+# Model
+```{r}
+# Linear Regression Model
+set.seed(123)
+train_control <- trainControl(method = "cv", number = 5)
+
+model <- train(
+  Price ~ Year + Kilometers_Driven + Mileage + Engine + Power + Seats,
+  data = numerical_data,
+  method = "lm",
+  trControl = train_control
+)
+
+ summary(model$finalModel)
+ 
+# Predictions
+numerical_data <- numerical_data %>%
+  mutate(Predicted_Price = predict(model, newdata = numerical_data))
+
+# Scatter Plot: Actual vs Predicted Prices
+ggplot(numerical_data, aes(x = Price, y = Predicted_Price)) +
+  geom_point(alpha = 0.5, color = "blue") +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +
+  labs(title = "Actual vs Predicted Prices",
+       x = "Actual Price (Lakhs)", y = "Predicted Price (Lakhs)") +
+  theme_minimal()
+
+# Save the Final Dataset (Optional)
+#write.csv(numerical_data, "final_data_with_predictions.csv", row.names = FALSE)
+
+```
+
+
+
+
+
+# Results Summary
+```{r}
+# Print Model Summary
+
+summary(model$finalModel)
+
+```
+
+
+
+# Model Performance
+
+
+## Ethical Considerations
+
+
+
+## Conclusion
+
+
+
+
+
+
+
+
+```{r}
+
+
+
+
+```
+
+```{r}
+# Load Required Libraries
+library(tidyverse)
+library(caret)
+library(knitr)
+
+# Assuming the model has been trained using train() and stored as `model`
+# For example, this is your cross-validation model
+# model <- train(price_USD ~ inches + battery + ram_GB + weight_g + storage_GB, 
+#                data = numerical_data, method = "lm", trControl = train_control)
+
+# Extract the summary of the final model
+model_summary <- anova(model$finalMode)
+
+# Create a tidy summary table of coefficients and statistics
+#coefficients_table <- as.data.frame(model_summary$coefficients)
+#coefficients_table <- coefficients_table %>%
+  #rownames_to_column("Variable") %>%
+  #rename(Estimate = `Estimate`, StdError = `Std. Error`, tValue = `t value`, PValue = `Pr(>|t|)`)
+
+# Display the summary table using kable for better presentation
+kable(model_summary, format = "markdown", caption = "Summary of Coefficients from the Cross-Validation Linear Regression Model")
+
+
+```
+
+```{r}
+# Load necessary libraries
+library(caret)
+
+# Prepare the dataset
+set.seed(123)  # For reproducibility
+data <- numerical_data  # Use your cleaned numerical dataset
+data <- na.omit(data)  # Ensure no missing values
+
+# Define the formula
+formula <- Price ~ Year + Kilometers_Driven + Mileage + Engine + Power + Seats
+
+# Create a custom train control for LOOCV
+control <- trainControl(method = "LOOCV")
+
+# Train the model using LOOCV
+model <- train(
+  formula,
+  data = data,
+  method = "lm",  # Linear regression
+  trControl = control
+)
+
+# Print the model summary
+print(model)
+
+# Make predictions for each LOOCV iteration
+predictions <- predict(model, data)
+
+# Compare predicted vs actual prices
+results <- data.frame(
+  Actual = data$Price,
+  Predicted = predictions
+)
+
+# Print the first few rows of results
+print(head(results))
+
+# Calculate Mean Absolute Error (MAE)
+mae <- mean(abs(results$Actual - results$Predicted))
+cat("Mean Absolute Error (MAE):", mae, "\n")
+
+ggplot(results, aes(x = Actual, y = Predicted)) +
+  geom_point(color = "blue", size = 3, alpha = 0.6) +  # Scatter points
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed", size = 1) +  # Diagonal reference line
+  labs(
+    title = "Actual vs Predicted Prices for Used Cars",
+    x = "Actual Price ",
+    y = "Predicted Price "
+  ) +
+  theme_minimal() +  # Clean theme
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 14)
+  )
+```
+
+```{r}
+library(dplyr)
+library(gganimate)
+used_cars$Year <- as.numeric(used_cars$Year)
+# Grouping data by Year and calculating the average Price
+used_cars_time <- used_cars %>%
+group_by(Year) %>%
+summarise(avg_price = mean(Price, na.rm = TRUE))
+# Plotting the average car price over time
+ggplot(used_cars_time) +
+ aes(x = Year, y = avg_price) +
+ geom_point(color = "blue") +
+ geom_line(color = "blue") +
+ xlim(1980, 2024) +
+ xlab("Year") +
+ ylab("Average Car Price (USD)") +
+ ggtitle("Figure: Average Car Price Over Time") +
+theme(plot.title = element_text(hjust = 0.5)) +
+transition_reveal(Year)
+```
+
