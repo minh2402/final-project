@@ -82,6 +82,10 @@ corrplot(cor_matrix, method = "circle", type = "upper",
 ```
 The correlation matrix plot, visualizing the relationships between numerical variables in the used car dataset. Each variable is paired with the others, and the size and color of the circles represent the strength and direction of their correlations. Positive correlations are shown in blue, while negative correlations are in red. The darker and larger the circle, the stronger the correlation. For instance, variables like Power and Price appear to have a strong positive correlation, indicating that as engine power increases, the price of the car tends to increase. Conversely, variables like Mileage show weaker or mixed relationships with other variables. This plot helps identify which features are most strongly related to the target variable (Price) for predictive modeling.
 
+Muhyadin:
+
+The correlation analysis of the dataset shows several key insights. Price and Power are positively correlated, which means that with increased power, the price of the vehicle goes up. Cars with higher horsepower generally command higher prices due to their enhanced performance and desirability. There is a moderate positive correlation between Year and Price, indicating that the price of newer car models is higher compared to older ones. In contrast, the Mileage is negatively correlated with Power and Engine, which indicates that high-mileage vehicles have low engine capacity and power. Lastly, Kilometers Driven is very poorly correlated with most of the variables, so this variable has very minimal direct impact on the pricing of used cars in this dataset. These findings provide valuable insights into the factors that influence used car prices.
+
 ```{r}
 library(dplyr)
 library(gganimate)
@@ -107,6 +111,7 @@ ggplot(used_cars_time) +
 
 Explain with citation:
 
+The correlation analysis of the dataset shows several key insights. Price and Power are positively correlated, which means that with increased power, the price of the vehicle goes up. Cars with higher horsepower generally command higher prices due to their enhanced performance and desirability. There is a moderate positive correlation between Year and Price, indicating that the price of newer car models is higher compared to older ones. In contrast, the Mileage is negatively correlated with Power and Engine, which indicates that high-mileage vehicles have low engine capacity and power. Lastly, Kilometers Driven is very poorly correlated with most of the variables, so this variable has very minimal direct impact on the pricing of used cars in this dataset. These findings provide valuable insights into the factors that influence used car prices.
 
 
 ```{r}
@@ -117,6 +122,11 @@ ggplot(numerical_data, aes(x = Mileage)) +
   theme_minimal()
 ```
 Explain with citation:
+
+This graph shows that over the years, car prices have risen linearly, reflecting larger market trends and inflation. More specifically, there is a larger jump in average price after the year 2015. This may be due to the development of automotive technology as well as increased consumer desires for higher-end features. From the year 2000 to the year 2010, car prices remained somewhat similar, possibly due to the general global recession affecting the income of people. These trends suggest that economic factors, like inflation and market conditions, as well as technological innovations, make a big difference in how car prices change over time.
+
+In India, car ownership was once seen as a luxury, and more importance was given to used cars. Used cars generally retain their value longer. During the early 2000s, the steady growth of India's economy and its moderate inflation levels supported consistent pricing, hence preventing extreme fluctuations in the automotive sector. However, car ownership was less common, and affordability remained a constraint, making demand and supply for used cars balanced and hence stable in terms of prices. This era thus illustrates how macroeconomic stability and shifting consumer perceptions together drive the used car market.
+
 
 ```{r}
 # Bar Plot: Average Price by Seats
