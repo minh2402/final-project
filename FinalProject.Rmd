@@ -154,6 +154,8 @@ numerical_data %>%
 ```
 Explain with citation:
 
+The trends of car prices by seat capacity show a big difference. The average prices for two-seater cars are usually the highest, sometimes because they are luxury or sports models that attract premium buyers. On the other hand, five-seater cars, which are common family cars, are generally more reasonably priced due to their wide appeal and mass-market availability. While seven-seater cars show quite a remarkable rise in prices, reflecting their demand from larger families and the popularity of premium SUVs offering more space and comfort. However, vehicles with more than eight seats have a gradual decline in average prices; this means that these models are mostly utilitarian and rarely sell for luxury, mostly commercial or transport purposes. These trends indicate how functionality and market demand might affect pricing.
+
 
 ## Model and Results
 
